@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QMOOSA Post-Quantum Cryptography — Hybrid Post-Quantum TLS 1.3 Explorer</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #121826;
+      --border: #232f48;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --quantum: #a855f7;
+      --classical: #3b82f6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; }
+    body { background-color: var(--bg); color: var(--text); padding: 24px; }
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+    .badge { padding: 6px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-locked { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
+    .badge-pqc { background: rgba(168, 85, 247, 0.15); color: var(--quantum); border: 1px solid var(--quantum); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+    h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+    th { color: var(--text-muted); font-weight: 500; }
+    .mono { font-family: monospace; color: var(--accent); }
+    .flow-step { background: rgba(18, 24, 38, 0.8); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+    .flow-title { font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .flow-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .metric-value { font-size: 24px; font-weight: 700; color: #fff; margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1 style="font-size: 24px; font-weight: 800;">QMOOSA PQC Hybrid TLS 1.3 Key Exchange Terminal</h1>
+      <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">
+        NIST FIPS 203 (ML-KEM-768) + RFC 8446 (X25519) Dual-Layer Post-Quantum Transport Security
+      </p>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <span class="badge badge-success">ZERO GAS & ZERO CLOUD SPEND</span>
+      <span class="badge badge-locked">DEPLOYMENT: LOCKED (0/1,000 CERTIFIED)</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Hybrid Cipher Group Specification</h2>
+      <table>
+        <tr>
+          <th>Named Group</th>
+          <td><span class="mono">X25519MLKEM768</span></td>
+        </tr>
+        <tr>
+          <th>Group Codepoint</th>
+          <td><span class="mono">0x11ec</span> (RFC / IETF draft)</td>
+        </tr>
+        <tr>
+          <th>Classical Component</th>
+          <td>X25519 ECDH (Curve25519, 32 B key)</td>
+        </tr>
+        <tr>
+          <th>Quantum Component</th>
+          <td>NIST FIPS 203 ML-KEM-768 (Lattice-based, Module-LWE)</td>
+        </tr>
+        <tr>
+          <th>Combined Shared Secret</th>
+          <td><span class="mono">64 B</span> (32 B PQC || 32 B ECDH)</td>
+        </tr>
+        <tr>
+          <th>Record Layer Encryption</th>
+          <td>AES-256-GCM with Monotonic 64-bit Sequence Counters</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Wire Format & Transmit Overhead</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Handshake Message</th>
+            <th>Classical Portion</th>
+            <th>PQC Portion</th>
+            <th>Total Wire Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ClientKeyShare (ClientHello)</td>
+            <td>32 B (X25519 pk)</td>
+            <td>1,184 B (ML-KEM ek)</td>
+            <td><strong class="mono">1,216 B</strong></td>
+          </tr>
+          <tr>
+            <td>ServerKeyShare (ServerHello)</td>
+            <td>32 B (X25519 pk)</td>
+            <td>1,088 B (ML-KEM ct)</td>
+            <td><strong class="mono">1,120 B</strong></td>
+          </tr>
+          <tr>
+            <td>Combined Shared Secret</td>
+            <td>32 B (ECDH secret)</td>
+            <td>32 B (KEM shared secret)</td>
+            <td><strong class="mono">64 B</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+        The combined key shares fit comfortably within standard Ethernet MTU (1500 bytes), avoiding TCP fragmentation during the initial ClientHello flight.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Harvest Now, Decrypt Later (HNDL) Threat Mitigation</h2>
+      <div class="flow-step">
+        <div class="flow-title">
+          <span>Adversary Eavesdropping</span>
+          <span class="badge badge-locked">HNDL Risk</span>
+        </div>
+        <div class="flow-desc">
+          State-sponsored actors passively capture and store encrypted session traffic today. When Cryptanalytically Relevant Quantum Computers (CRQC) emerge, classical ECDH can be broken using Shor's Algorithm in polynomial time.
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-title">
+          <span>QMOOSA Hybrid Protection</span>
+          <span class="badge badge-success">Quantum Resilient</span>
+        </div>
+        <div class="flow-desc">
+          The session key is derived from HKDF-Extract-Expand across both secrets. Even if Shor's Algorithm collapses X25519, the session remains mathematically impenetrable due to the hardness of the Module Learning With Errors (M-LWE) lattice problem in ML-KEM-768.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Handshake & Record Layer State Machine</h2>
+      <div class="flow-step">
+        <div class="flow-title">
+          <span>Step 1: ClientHello</span>
+          <span class="mono">1,216 B Wire</span>
+        </div>
+        <div class="flow-desc">Client generates ephemeral X25519 keypair and ML-KEM-768 keypair. Bundles both public components into ClientKeyShare extension (group 0x11ec).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-title">
+          <span>Step 2: ServerHello</span>
+          <span class="mono">1,120 B Wire</span>
+        </div>
+        <div class="flow-desc">Server generates ephemeral X25519 keypair, computes ECDH secret, encapsulates ML-KEM ciphertext, and derives 64-byte combined shared secret.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-title">
+          <span>Step 3: Symmetric Record Session</span>
+          <span class="mono">AES-256-GCM</span>
+        </div>
+        <div class="flow-desc">Client & Server derive traffic encryption keys and IVs using HKDF-SHA256. Every record uses IV masked by monotonic 64-bit sequence counter ($IV \oplus \text{seq\_num}$), preventing replay attacks.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

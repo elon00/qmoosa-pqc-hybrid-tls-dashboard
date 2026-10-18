@@ -1,0 +1,27 @@
+{
+  "name": "@qmoosa/pqc-hybrid-tls-dashboard",
+  "version": "1.0.0",
+  "description": "QMOOSA Post-Quantum Cryptography — Hybrid Post-Quantum TLS 1.3 Key Exchange Interactive Security Dashboard",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/dashboard.test.mjs",
+    "lint": "node --check tests/dashboard.test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7"
+  },
+  "keywords": [
+    "qmoosa",
+    "pqc",
+    "hybrid-tls",
+    "tls-1.3",
+    "x25519",
+    "ml-kem-768",
+    "fips-203",
+    "dashboard",
+    "quantum-safe",
+    "web4"
+  ],
+  "author": "elon00",
+  "license": "MIT"
+}
