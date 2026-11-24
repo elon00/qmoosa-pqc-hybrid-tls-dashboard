@@ -2,3 +2,6 @@ node_modules/
 npm-debug.log
 .DS_Store
 *.tgz
+
+# Lean 4 build artifacts
+lean_verify/.lake/
